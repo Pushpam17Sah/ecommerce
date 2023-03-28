@@ -3,6 +3,11 @@ from .serializers import ProductSerializer,CategorySerializer
 from . models import Product,Category
 from django.db.models import Sum, Max, Min, Avg
 from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.filters import OrderingFilter
+from rest_framework.authentication import BasicAuthentication,SessionAuthentication
+from rest_framework.permissions import IsAuthenticated,IsAdminUser
 
 # from django.shortcuts import render
 # from django.http import HttpResponse
@@ -13,10 +18,17 @@ from django.shortcuts import render
 class ProductModelViewSet(viewsets.ModelViewSet):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
-    filterset_fields=['product_name']
-    filterset_fields=['amount']
-    filterset_fields=['date_added']
-    filterset_fields=['category']
+    filterset_fields=['product_name','amount','date_added','category']
+    filter_backends=[OrderingFilter]
+    # ordering_fields=['date_added']
+    # authentication_classes=[BasicAuthentication]
+    authentication_classes=[SessionAuthentication]
+
+    permission_classes=[IsAuthenticated]
+    
+
+  
+    
 
 
     # def example(request):
@@ -26,15 +38,22 @@ class ProductModelViewSet(viewsets.ModelViewSet):
     #     avg=Product.objects.aggregate(avg=Avg('amount'))
 
     #     return(request)
+@api_view(['GET'])
+def example(request):
+    data = Product.objects.aggregate(sum=Sum('amount'), max=Max('amount'),min=Min('amount'),avg=Avg('amount'))
+    return Response({"data":data})
 
-# def example(request):
-#   data = Product.objects.aggregate(sum=Sum('amount'), max=Max('amount'),min=Min('amount'),avg=Avg('amount'))
-#   return (request,{"data":data})
-data = Product.objects.aggregate(sum=Sum('amount'), max=Max('amount'),min=Min('amount'),avg=Avg('amount'))
-print(data)
+# @api_view(['GET'])
+# def examples(request):
+#     datas = Product.objects.annotate(avg=Avg('amount'))
+#     return Response({"data":datas})
+
+
 
 class CategoryModelViewSet(viewsets.ModelViewSet):
     queryset=Category.objects.all()
     serializer_class=CategorySerializer
     filterset_fields=['category']
+    
+
 

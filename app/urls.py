@@ -8,5 +8,8 @@ router.register('category',views.CategoryModelViewSet)
 
 urlpatterns = [
     path('',include(router.urls)),
-    # path('home/',views.example),
+    path('aggregate/',views.example),
+    # path('annotate/',views.examples),
+    path('auth/',include('rest_framework.urls',namespace='rest_framework'))#SESSION AUTHENTICATION
+
 ]
